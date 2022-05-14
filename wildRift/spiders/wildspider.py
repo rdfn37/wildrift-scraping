@@ -17,14 +17,21 @@ def getNames():
 
     allChamps = []
 
+    # for i in data:
+    #     allChamps.append('https://wildrift.leagueoflegends.com/en-us/champions/' +
+    #                      i['name'].lower().replace('. ', '-').replace(' ', '-').replace("'", "-"))
+
     for i in data:
-        allChamps.append('https://wildrift.leagueoflegends.com/en-us/champions/' +
-                         i['name'].lower().replace('. ', '-').replace(' ', '-').replace("'", "-"))
+        allChamps.append('https://wildrift.leagueoflegends.com' + i['url'])
 
     return allChamps
 
 
-urlList = getNames()
+# urlList = getNames()
+urlList = [getNames()[11],
+           #    getNames()[39],
+           getNames()[51]
+           ]
 
 driver = webdriver.Chrome()
 
@@ -37,7 +44,7 @@ class Wildspider(scrapy.Spider):
 
     def parse(self, res):
 
-        for linkIndex, link in enumerate(urlList):
+        for link in urlList:
             driver.get(link)
             currentChamp = scrapy.Selector(text=driver.page_source)
 
@@ -46,9 +53,10 @@ class Wildspider(scrapy.Spider):
 
             heroContent = currentChamp.css('div.heroContent-1_EhD')
             skills = []
+            skins = []
 
             try:
-                element = WebDriverWait(driver, 10).until(
+                element = WebDriverWait(driver, 100).until(
                     EC.presence_of_all_elements_located(
                         (By.CLASS_NAME, "thumbnail-21xPX"))
                 )
@@ -78,6 +86,32 @@ class Wildspider(scrapy.Spider):
                     }
 
                     skills.append(skill)
+
+                driver.execute_script("window.scrollTo(0, 1800)")
+
+                skinIcons = currentChamp.css(
+                    'li.thumbnail-3NKId').xpath('.//span//img//@src').getall()
+
+                iconClick = WebDriverWait(driver, 100).until(
+                    EC.presence_of_all_elements_located(
+                        (By.CLASS_NAME, "thumbnail-3NKId"))
+                )
+
+                for skinIconIndex, skinIcon in enumerate(iconClick):
+                    skinIcon.click()
+
+                    currentSkin = scrapy.Selector(text=driver.page_source)
+
+                    skinImage = currentSkin.xpath(
+                        '//img[@data-testid="skins:skin-image"]//@src').get()
+
+                    skin = {
+                        'skinImage': skinImage,
+                        'skinIcon': skinIcons[skinIconIndex]
+                    }
+
+                    skins.append(skin)
+
             except:
                 print('Close')
                 driver.quit()
@@ -88,7 +122,8 @@ class Wildspider(scrapy.Spider):
                 'role': heroContent.css('span.roleName-33zEx::text').get(),
                 'difficulty': heroContent.css('span.difficultyName-3NSea::text').get(),
                 'heroVideo': currentChamp.css('div.heroVideo-1Jeta').css('source').attrib['src'],
-                'skills': skills
+                'skills': skills,
+                'skins': skins
             }
 
         print("Scraping completed")
