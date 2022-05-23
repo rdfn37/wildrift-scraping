@@ -17,24 +17,16 @@ def getNames():
 
     allChamps = []
 
-    # for i in data:
-    #     allChamps.append('https://wildrift.leagueoflegends.com/en-us/champions/' +
-    #                      i['name'].lower().replace('. ', '-').replace(' ', '-').replace("'", "-"))
-
     for i in data:
         allChamps.append('https://wildrift.leagueoflegends.com' + i['url'])
 
     return allChamps
 
 
-# urlList = getNames()
-urlList = [getNames()[11],
-           #    getNames()[39],
-           getNames()[51]
-           ]
+urlList = getNames()
+# urlList = [getNames()[11], getNames()[22]]
 
 driver = webdriver.Chrome()
-
 
 # Returns more detailed information on Wild Rift champions.
 class Wildspider(scrapy.Spider):
@@ -105,9 +97,13 @@ class Wildspider(scrapy.Spider):
                     skinImage = currentSkin.xpath(
                         '//img[@data-testid="skins:skin-image"]//@src').get()
 
+                    skinName = currentSkin.xpath(
+                        '//span[@class="skinName-5H0GE"]//text()').get()
+
                     skin = {
                         'skinImage': skinImage,
-                        'skinIcon': skinIcons[skinIconIndex]
+                        'skinIcon': skinIcons[skinIconIndex],
+                        'skinName': skinName
                     }
 
                     skins.append(skin)

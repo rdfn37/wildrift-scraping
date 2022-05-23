@@ -1,6 +1,5 @@
 import scrapy
 
-
 # Returns a json with all names and imgs url.
 class Namesspider(scrapy.Spider):
     name = 'names'
