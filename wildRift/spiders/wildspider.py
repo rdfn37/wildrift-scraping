@@ -41,20 +41,20 @@ class Wildspider(scrapy.Spider):
             currentChamp = scrapy.Selector(text=driver.page_source)
 
             print('Open')
-            driver.execute_script("window.scrollTo(0, 620)")
+            driver.execute_script("window.scrollTo(0, 650)")
 
-            heroContent = currentChamp.css('div.heroContent-1_EhD')
+            heroContent = currentChamp.css('div.ChampionDetailHero-module--heroContent--qV1Vv')
             skills = []
             skins = []
 
             try:
-                element = WebDriverWait(driver, 100).until(
+                element = WebDriverWait(driver, 30).until(
                     EC.presence_of_all_elements_located(
-                        (By.CLASS_NAME, "thumbnail-21xPX"))
+                        (By.XPATH, '//div[@class="ChampionAbilities-module--abilitiesWrapper--Y7oJG"]//div//ul//li//span'))
                 )
 
                 skillImgs = currentChamp.xpath(
-                    '//div[@class="abilitiesDetailsWrapper-3nyLR"]//ul//li//span//img//@src').getall()
+                    '//div[@class="ChampionAbilities-module--abilitiesDetailsWrapper--pzoo6"]//ul//li//span//img//@src').getall()
                 for index, i in enumerate(element):
                     i.click()
                     currentSkill = scrapy.Selector(text=driver.page_source)
@@ -79,14 +79,14 @@ class Wildspider(scrapy.Spider):
 
                     skills.append(skill)
 
-                driver.execute_script("window.scrollTo(0, 1800)")
+                driver.execute_script("window.scrollTo(0, 1850)")
 
                 skinIcons = currentChamp.css(
-                    'li.thumbnail-3NKId').xpath('.//span//img//@src').getall()
+                    'li.SkinsSection-module--thumbnail--CGbJK').xpath('.//span//img//@src').getall()
 
-                iconClick = WebDriverWait(driver, 100).until(
+                iconClick = WebDriverWait(driver, 30).until(
                     EC.presence_of_all_elements_located(
-                        (By.CLASS_NAME, "thumbnail-3NKId"))
+                        (By.XPATH, '//div[@class="SkinsSection-module--skinsListWrapper--lJstv"]//ul//li//span'))
                 )
 
                 for skinIconIndex, skinIcon in enumerate(iconClick):
@@ -98,7 +98,7 @@ class Wildspider(scrapy.Spider):
                         '//img[@data-testid="skins:skin-image"]//@src').get()
 
                     skinName = currentSkin.xpath(
-                        '//span[@class="skinName-5H0GE"]//text()').get()
+                        '//span[@class="SkinsSection-module--skinName--G8Yg9"]//text()').get()
 
                     skin = {
                         'skinImage': skinImage,
@@ -113,11 +113,11 @@ class Wildspider(scrapy.Spider):
                 driver.quit()
 
             yield {
-                'name': heroContent.css('h3.championName-1JnC5::text').get(),
-                'subtitle': heroContent.css('p.championSubtitle-YAx7w::text').get(),
-                'role': heroContent.css('span.roleName-33zEx::text').get(),
-                'difficulty': heroContent.css('span.difficultyName-3NSea::text').get(),
-                'heroVideo': currentChamp.css('div.heroVideo-1Jeta').css('source').attrib['src'],
+                'name': heroContent.css('h3.ChampionDetailHero-module--championName--eyJEV::text').get(),
+                'subtitle': heroContent.css('p.ChampionDetailHero-module--championSubtitle--3twYV::text').get(),
+                'role': heroContent.css('span.ChampionDetailHero-module--roleName--If7UP::text').get(),
+                'difficulty': heroContent.css('span.ChampionDetailHero-module--difficultyName--ZpgVc::text').get(),
+                # 'heroVideo': currentChamp.css('div.heroVideo-1Jeta').css('source').attrib['src'],
                 'skills': skills,
                 'skins': skins
             }
