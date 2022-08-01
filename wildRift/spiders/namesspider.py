@@ -10,5 +10,6 @@ class Namesspider(scrapy.Spider):
         for champions in res.css('li.ChampionList-module--championCardItem--RVNEa'):
             yield {
                 'name': champions.css('h3::text').get(),
-                'url': champions.css('a.ChampionListCard-module--championListCardWrapper--BJ2LG').attrib['href']
+                'url': champions.css('a.ChampionListCard-module--championListCardWrapper--BJ2LG').attrib['href'],
+                'image': champions.css('img').xpath('@src').get()
             }
