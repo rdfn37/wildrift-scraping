@@ -24,7 +24,7 @@ def getNames():
 
 
 urlList = getNames()
-# urlList = [getNames()[11], getNames()[22]]
+# urlList = [getNames()[0], getNames()[1]]
 
 driver = webdriver.Chrome()
 
@@ -65,6 +65,8 @@ class Wildspider(scrapy.Spider):
                         '//span[@data-testid="abilities:abilitytype"]//text()').get()
                     skillVideo = currentSkill.xpath(
                         '//video[@data-testid="abilities:video"]//source//@src').get()
+                    skillDescription = currentSkill.xpath(
+                        '//p[@data-testid="abilities:description"]//text()').get()
                     skillImg = skillImgs[index]
 
                     if skillType == "4":
@@ -74,6 +76,7 @@ class Wildspider(scrapy.Spider):
                         'skillName': skillName,
                         'skillType': skillType,
                         'skillVideo': skillVideo,
+                        'skillDescription': skillDescription,
                         'skillImg': skillImg
                     }
 
@@ -117,7 +120,7 @@ class Wildspider(scrapy.Spider):
                 'subtitle': heroContent.css('p.ChampionDetailHero-module--championSubtitle--3twYV::text').get(),
                 'role': heroContent.css('span.ChampionDetailHero-module--roleName--If7UP::text').get(),
                 'difficulty': heroContent.css('span.ChampionDetailHero-module--difficultyName--ZpgVc::text').get(),
-                # 'heroVideo': currentChamp.css('div.heroVideo-1Jeta').css('source').attrib['src'],
+                'heroVideo': currentChamp.css('div.ChampionDetailHero-module--heroVideo--aA0bO').css('source').attrib['src'],
                 'skills': skills,
                 'skins': skins
             }
